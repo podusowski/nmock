@@ -4,15 +4,20 @@ from nmock import Mock, MockError
 
 def test_nonexpexted_call():
     m = Mock()
-    with pytest.raises(MockError):
+    with pytest.raises(
+            MockError, match="unexpected call.*hello") as e:
         m("hello")
 
 
 def test_nonexpected_call_bacause_args_are_different():
     m = Mock()
-    m.expect_call(1, "hello")
-    with pytest.raises(MockError):
-        m(2, "hello")
+    m.expect_call(1, text="hello")
+
+    match = ("unexpected call.*2.*text=hi.*"
+             "expected.*1.*text=hello")
+
+    with pytest.raises(MockError, match=match):
+        m(2, text="hi")
 
 
 def test_nonexpected_call_bacause_kwargs_are_different():
