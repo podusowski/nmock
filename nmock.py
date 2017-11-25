@@ -1,6 +1,9 @@
 from collections import namedtuple
 
 
+class MockError(Exception): pass
+
+
 class Call:
     def __init__(self, args, kwargs):
         self._key = args, frozenset(kwargs.items())
@@ -16,6 +19,10 @@ class Expectation:
     def __init__(self):
         self._count = 1
 
+    @property
+    def done(self):
+        return self._count == 0
+
 
 class Mock:
     def __init__(self):
@@ -28,6 +35,13 @@ class Mock:
         call = Call(args, kwargs)
         expectation = self._expectations.get(call, None)
         if expectation is None or not expectation._count:
-            raise RuntimeError()
+            raise MockError()
         else:
             expectation._count -= 1
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, type, value, traceback):
+        if not all(e.done for e in self._expectations.values()):
+            raise MockError()
