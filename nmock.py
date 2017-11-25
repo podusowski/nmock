@@ -1,3 +1,6 @@
+from collections import defaultdict
+
+
 class MockError(Exception): pass
 
 
@@ -24,6 +27,7 @@ class Expectation:
 class Mock:
     def __init__(self):
         self._expectations = dict()
+        self._methods = defaultdict(Mock)
 
     def expect_call(self, *args, **kwargs):
         self._expectations[Call(args, kwargs)] = Expectation()
@@ -39,6 +43,13 @@ class Mock:
     def __enter__(self):
         return self
 
+    def _all_expectations_met(self):
+        return (all(e.done for e in self._expectations.values())
+                and all(m._all_expectations_met() for m in self._methods.values()))
+
     def __exit__(self, type, value, traceback):
-        if not all(e.done for e in self._expectations.values()):
+        if not self._all_expectations_met():
             raise MockError()
+
+    def __getattr__(self, name):
+        return self._methods[name]

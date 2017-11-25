@@ -40,3 +40,15 @@ def test_didnt_make_expected_call():
     with pytest.raises(MockError):
         with Mock() as m:
             m.expect_call()
+
+
+def test_methods_are_also_mocks():
+    with Mock() as m:
+        m.foo.expect_call()
+        m.foo()
+
+
+def test_method_mocks_are_checked_in_ctx_manager():
+    with pytest.raises(MockError):
+        with Mock() as m:
+            m.foo.expect_call()
