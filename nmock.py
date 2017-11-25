@@ -1,16 +1,33 @@
 from collections import namedtuple
 
 
-_Expectation = namedtuple("_Expectation", ["args", "kwargs"])
+class Call:
+    def __init__(self, args, kwargs):
+        self._key = args, frozenset(kwargs.items())
+
+    def __eq__(self, other):
+        return self._key == other._key
+
+    def __hash__(self):
+        return hash(self._key)
+
+
+class Expectation:
+    def __init__(self):
+        self._count = 1
 
 
 class Mock:
     def __init__(self):
-        self._expectations = set()
+        self._expectations = dict()
 
     def expect_call(self, *args, **kwargs):
-        self._expectations.add(_Expectation(args, frozenset(kwargs.items())))
+        self._expectations[Call(args, kwargs)] = Expectation()
 
     def __call__(self, *args, **kwargs):
-        if _Expectation(args, frozenset(kwargs.items())) not in self._expectations:
+        call = Call(args, kwargs)
+        expectation = self._expectations.get(call, None)
+        if expectation is None or not expectation._count:
             raise RuntimeError()
+        else:
+            expectation._count -= 1

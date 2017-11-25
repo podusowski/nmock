@@ -26,3 +26,11 @@ def test_expected_call():
     m = Mock()
     m.expect_call(1, "hello", name="Piotr", place="Wroclaw")
     m(1, "hello", name="Piotr", place="Wroclaw")
+
+
+def test_same_call_twice():
+    m = Mock()
+    m.expect_call(1, "hello", name="Piotr", place="Wroclaw")
+    m(1, "hello", name="Piotr", place="Wroclaw")
+    with pytest.raises(Exception):
+        m(1, "hello", name="Piotr", place="Wroclaw")
