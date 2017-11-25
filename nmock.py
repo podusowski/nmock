@@ -1,6 +1,3 @@
-from collections import namedtuple
-
-
 class MockError(Exception): pass
 
 
