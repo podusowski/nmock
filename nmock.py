@@ -20,7 +20,7 @@ class Expectation:
         self._count = 1
 
     @property
-    def done(self):
+    def met(self):
         return self._count == 0
 
 
@@ -44,7 +44,7 @@ class Mock:
         return self
 
     def _all_expectations_met(self):
-        return (all(e.done for e in self._expectations.values())
+        return (all(e.met for e in self._expectations.values())
                 and all(m._all_expectations_met() for m in self._methods.values()))
 
     def __exit__(self, type, value, traceback):
