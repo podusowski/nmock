@@ -2,14 +2,14 @@ import pytest
 from nmock import Mock, MockError
 
 
-def test_nonexpexted_call():
+def test_unexpexted_call():
     m = Mock()
     with pytest.raises(
             MockError, match="unexpected call.*hello") as e:
         m("hello")
 
 
-def test_nonexpected_call_bacause_args_are_different():
+def test_expected_different_args():
     m = Mock()
     m.expect_call(1, text="hello")
 
@@ -20,16 +20,7 @@ def test_nonexpected_call_bacause_args_are_different():
         m(2, text="hi")
 
 
-def test_mutable_args():
-    MUTABLE_ARG1 = {"value": 1}
-    MUTABLE_ARG2 = {"value": 2}
-
-    with Mock() as m:
-        m.expect_call(MUTABLE_ARG1, key=MUTABLE_ARG2)
-        m(MUTABLE_ARG1, key=MUTABLE_ARG2)
-
-
-def test_nonexpected_call_bacause_kwargs_are_different():
+def test_expected_different_kwargs():
     m = Mock()
     m.expect_call(1, text="hello")
     with pytest.raises(MockError):
@@ -40,6 +31,15 @@ def test_expected_call():
     m = Mock()
     m.expect_call(1, "hello", name="Piotr", place="Wroclaw")
     m(1, "hello", name="Piotr", place="Wroclaw")
+
+
+def test_expected_call_with_mutable_args():
+    MUTABLE_ARG1 = {"value": 1}
+    MUTABLE_ARG2 = {"value": 2}
+
+    with Mock() as m:
+        m.expect_call(MUTABLE_ARG1, key=MUTABLE_ARG2)
+        m(MUTABLE_ARG1, key=MUTABLE_ARG2)
 
 
 def test_same_call_twice():
@@ -56,13 +56,13 @@ def test_didnt_make_expected_call():
             m.expect_call()
 
 
-def test_methods_are_also_mocks():
+def test_expected_method_call():
     with Mock() as m:
         m.foo.expect_call()
         m.foo()
 
 
-def test_method_mocks_are_checked_in_ctx_manager():
+def test_missing_expected_method_call():
     with pytest.raises(MockError):
         with Mock() as m:
             m.foo.expect_call()
