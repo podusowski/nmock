@@ -20,6 +20,15 @@ def test_nonexpected_call_bacause_args_are_different():
         m(2, text="hi")
 
 
+def test_mutable_args():
+    MUTABLE_ARG1 = {"value": 1}
+    MUTABLE_ARG2 = {"value": 2}
+
+    with Mock() as m:
+        m.expect_call(MUTABLE_ARG1, key=MUTABLE_ARG2)
+        m(MUTABLE_ARG1, key=MUTABLE_ARG2)
+
+
 def test_nonexpected_call_bacause_kwargs_are_different():
     m = Mock()
     m.expect_call(1, text="hello")
