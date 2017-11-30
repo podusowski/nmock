@@ -21,12 +21,15 @@ class Call:
 
 class Expectation:
     def __init__(self, call):
-        self._count = 1
+        self.count = 1
         self.call = call
 
     @property
     def met(self):
-        return self._count == 0
+        return self.count == 0
+
+    def mark_call(self):
+        self.count -= 1
 
     def __repr__(self):
         return repr(self.call)
@@ -51,11 +54,11 @@ class Mock:
 
     def __call__(self, *args, **kwargs):
         call = Call(args, kwargs)
-        expectation = self._find_expectation(call)
-        if expectation is None or not expectation._count:
+        e = self._find_expectation(call)
+        if e is None or e.met:
             raise MockError("unexpected call with arguements: {}, expected: {}".format(call, self._expectations))
         else:
-            expectation._count -= 1
+            e.mark_call()
 
     def __enter__(self):
         return self
